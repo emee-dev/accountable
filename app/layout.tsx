@@ -1,15 +1,22 @@
+import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ConvexClientProvider } from "@/provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const jetbrains_mono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+  variable: "--font-jetbrains-mono",
 });
 
 export const metadata: Metadata = {
@@ -23,12 +30,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <ConvexClientProvider>
+      <html lang="en">
+        <body
+          className={`${inter.className} ${geistMono.variable} ${GeistSans.variable} ${jetbrains_mono.variable} antialiased`}
+        >
+          {children}
+        </body>
+      </html>
+    </ConvexClientProvider>
   );
 }
