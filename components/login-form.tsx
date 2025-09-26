@@ -27,7 +27,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  //   const { isLoading, isAuthenticated } = useConvexAuth();
   const signUp = useMutation(api.auth.userSignUp);
   const [shouldRickRoll, setShouldRickRoll] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -41,11 +40,13 @@ export function LoginForm({
     email: string;
     password: string;
   }) => {
-    await authClient.signUp.email(
+    // debugger;
+    const { data, error } = await authClient.signUp.email(
       {
         name,
         email,
         password,
+        // callbackURL: "/",
       },
       {
         onRequest: (x) => {
@@ -56,18 +57,16 @@ export function LoginForm({
         },
         onError: async (ctx) => {
           setLoading(false);
-          console.log(ctx);
-          // console.error(ctx.error);
-          // console.error("response", ctx.response);
-          // toast.error(ctx.error.message);
+          console.log("onError: ", ctx.error.message);
         },
       }
     );
+
+    console.log("After request error: ", error);
   };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
 
     const form = new FormData(e.currentTarget);
 
@@ -75,21 +74,11 @@ export function LoginForm({
     const email = form.get("email") as string;
     const password = form.get("password") as string;
 
-    // await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    const x = await signUp({
-      email,
+    await handleSignUp({
       name,
+      email,
       password,
     });
-
-    console.log(x);
-
-    // await handleSignUp({
-    //   name,
-    //   email,
-    //   password,
-    // });
 
     // console.log({ name, email, password });
 

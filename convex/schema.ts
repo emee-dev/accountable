@@ -1,9 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { tables } from "./betterAuth/generatedSchema";
 
 const schema = defineSchema({
-  ...tables,
   tags: defineTable({
     userId: v.string(),
     twitter_tag: v.string(),
