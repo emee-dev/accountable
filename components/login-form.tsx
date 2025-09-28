@@ -27,7 +27,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const signUp = useMutation(api.auth.userSignUp);
   const [shouldRickRoll, setShouldRickRoll] = useState(false);
   const [loading, setLoading] = useState(false);
 

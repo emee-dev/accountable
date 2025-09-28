@@ -8,7 +8,7 @@ import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!, {
   expectAuth: true,
   // Disables - Error: Invalid deployment address
-  skipConvexDeploymentUrlCheck: true,
+  // skipConvexDeploymentUrlCheck: true,
 });
 
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
