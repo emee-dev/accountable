@@ -30,7 +30,7 @@ export function LoginForm({
   const [shouldRickRoll, setShouldRickRoll] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSignUp = async ({
+  const handleEmailPasswordSignUp = async ({
     name,
     email,
     password,
@@ -39,13 +39,13 @@ export function LoginForm({
     email: string;
     password: string;
   }) => {
-    // debugger;
     const { data, error } = await authClient.signUp.email(
       {
         name,
         email,
         password,
-        // callbackURL: "/",
+        // @ts-expect-error - will implement
+        twitterId: "baz",
       },
       {
         onRequest: (x) => {
@@ -60,8 +60,26 @@ export function LoginForm({
         },
       }
     );
+  };
 
-    console.log("After request error: ", error);
+  const handleOauthSignUp = async () => {
+    await authClient.signIn.social(
+      {
+        provider: "github",
+      },
+      {
+        onRequest: (x) => {
+          setLoading(true);
+        },
+        onSuccess: () => {
+          setLoading(false);
+        },
+        onError: async (ctx) => {
+          setLoading(false);
+          console.log("onError: ", ctx.error.message);
+        },
+      }
+    );
   };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -73,7 +91,7 @@ export function LoginForm({
     const email = form.get("email") as string;
     const password = form.get("password") as string;
 
-    await handleSignUp({
+    await handleEmailPasswordSignUp({
       name,
       email,
       password,
@@ -149,7 +167,12 @@ export function LoginForm({
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <Button variant="outline" type="button" className="w-full">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    className="w-full"
+                    onClick={() => handleOauthSignUp()}
+                  >
                     <GithubIconLight />
                     <span className="sr-onlyx">Github</span>
                   </Button>

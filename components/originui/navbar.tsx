@@ -1,3 +1,29 @@
+"use client";
+
+import Logo from "@/components/logo";
+import NotificationMenu from "@/components/notification-menu";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+import UserMenu from "@/components/user-menu";
+import { Authenticated } from "convex/react";
 import {
   ChevronRight,
   ChevronsUpDown,
@@ -8,45 +34,24 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { Select as SelectPrimitive } from "radix-ui";
-
-import Logo from "@/components/logo";
-import NotificationMenu from "@/components/notification-menu";
-import UserMenu from "@/components/user-menu";
-import {
-  Breadcrumb,
-  BreadcrumbEllipsis,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
+import { useState } from "react";
 import { ThemeToggler } from "../magicui/theme-toggler";
 import { Input } from "../ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Navbar() {
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const current = searchParams.get("v") ?? "twitter";
+
+  const handleChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("v", value);
+
+    router.push(`?${params.toString()}`);
+  };
+
   return (
     <header className="border-b">
       <div className="flex h-16 items-center justify-between gap-4">
@@ -58,20 +63,9 @@ export default function Navbar() {
                   <Logo />
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbItem className="md:hidden">
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="hover:text-foreground">
-                    <BreadcrumbEllipsis />
-                    <span className="sr-only">Toggle menu</span>
-                  </DropdownMenuTrigger>
-                </DropdownMenu>
-              </BreadcrumbItem>
               <BreadcrumbItem>
-                <Select defaultValue="1">
-                  <SelectPrimitive.SelectTrigger
-                    aria-label="Select project"
-                    asChild
-                  >
+                <Select defaultValue={current} onValueChange={handleChange}>
+                  <SelectPrimitive.SelectTrigger asChild>
                     <Button
                       variant="ghost"
                       className="focus-visible:bg-accent text-foreground h-8 px-1.5 focus-visible:ring-0"
@@ -84,8 +78,8 @@ export default function Navbar() {
                     </Button>
                   </SelectPrimitive.SelectTrigger>
                   <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
-                    <SelectItem value="1">Twitter</SelectItem>
-                    <SelectItem value="2">Events</SelectItem>
+                    <SelectItem value="event">Events</SelectItem>
+                    <SelectItem value="twitter">Twitter bookmarks</SelectItem>
                   </SelectContent>
                 </Select>
               </BreadcrumbItem>
@@ -94,7 +88,11 @@ export default function Navbar() {
         </div>
 
         <div className="grow">
-          <DocSearch />
+          {/* <DocSearch /> */}
+
+          <Authenticated>
+            <DocSearch />
+          </Authenticated>
         </div>
 
         <div className="flex items-center gap-4">

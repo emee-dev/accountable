@@ -27,16 +27,31 @@ export const createAuth = (
         allowDifferentEmails: true,
       },
     },
+    user: {
+      additionalFields: {
+        twitterId: {
+          type: "string",
+          required: false,
+        },
+      },
+      deleteUser: {
+        enabled: true,
+      },
+    },
     emailAndPassword: {
       enabled: true,
-      // requireEmailVerification: false,
+      requireEmailVerification: false,
+      async sendResetPassword(data, request) {},
+      async onPasswordReset(data, request) {
+        return;
+      },
     },
-    // socialProviders: {
-    //   github: {
-    //     clientId: process.env.GITHUB_CLIENT_ID as string,
-    //     clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-    //   },
-    // },
+    socialProviders: {
+      github: {
+        clientId: process.env.GITHUB_CLIENT_ID as string,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      },
+    },
     plugins: [convex()],
   });
 };

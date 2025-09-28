@@ -26,6 +26,8 @@ const eslintConfig = [
       "react/no-unescaped-entities": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "jsx-a11y/role-has-required-aria-props": "off",
+      " @typescript-eslint/ban-ts-comment": "off",
     },
   }),
 ];
