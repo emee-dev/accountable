@@ -1,4 +1,6 @@
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
+import { api, internal } from "./_generated/api";
 import {
   internalMutation,
   internalQuery,
@@ -6,14 +8,84 @@ import {
   query,
 } from "./_generated/server";
 import { authComponent } from "./auth";
-import { fetchAction } from "convex/nextjs";
-import { api, internal } from "./_generated/api";
+import { Doc } from "./_generated/dataModel";
 
 // You can get the current user from the auth component
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
     return await authComponent.getAuthUser(ctx);
+  },
+});
+
+export const listBookmarks = query({
+  args: {
+    date: v.string(),
+    twitterUsername: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const selectedDate = new Date(args.date);
+
+    const dayStart = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      0,
+      0,
+      0,
+      0
+    ).getTime();
+
+    const dayEnd = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      23,
+      59,
+      59,
+      999
+    ).getTime();
+
+    return await ctx.db
+      .query("bookmarked_tweets")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("tweetBy.userName"), args.twitterUsername),
+          q.gte(q.field("_creationTime"), dayStart),
+          q.lte(q.field("_creationTime"), dayEnd)
+        )
+      )
+      .order("desc")
+      .paginate(args.paginationOpts);
+  },
+});
+
+type Tweet = Doc<"bookmarked_tweets"> & {
+  screenshotUrl: string | null;
+};
+
+export const getBookmark = query({
+  args: {
+    tweetId: v.string(),
+    twitterUsername: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const data = await ctx.db
+      .query("bookmarked_tweets")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("tweetBy.userName"), args.twitterUsername),
+          q.eq(q.field("tweet.id"), args.tweetId)
+        )
+      )
+      .first();
+
+    const screenshotUrl = data?.storageId
+      ? await ctx.storage.getUrl(data?.storageId)
+      : null;
+
+    return { ...data, screenshotUrl } as Tweet;
   },
 });
 
@@ -33,14 +105,14 @@ export const isSystemUser = internalQuery({
 
 export const patchTweetRecord = internalMutation({
   args: {
-    id: v.id<"bookmarks">("bookmarks"),
-    thread_screenshot: v.string(),
-    thread_md_summary: v.string(),
+    bookmarkId: v.id<"bookmarked_tweets">("bookmarked_tweets"),
+    storageId: v.id("_storage"),
+    summary: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.id, {
-      thread_md_summary: args.thread_md_summary,
-      thread_screenshot: args.thread_screenshot,
+    await ctx.db.patch(args.bookmarkId, {
+      summary: args.summary,
+      storageId: args.storageId,
     });
   },
 });
@@ -77,20 +149,23 @@ export const processTweet = mutation({
     }),
   },
   handler: async (ctx, args) => {
+    const systemUser = args.tweetBy.userName;
     const isValidUser = await ctx.runQuery(internal.bookmarks.isSystemUser, {
-      userName: args.tweetBy.userName,
+      userName: systemUser,
     });
 
     if (!isValidUser) {
       console.log(
-        `@${args.tweetBy.userName} is not registered for monitoring.`
+        `Cannot bookmark this tweet, invalid user by @${args.tweetBy.userName}.`
       );
       return;
     }
 
+    const tweetId = args.tweet.id;
+
     const tweet = await ctx.db
-      .query("bookmarks")
-      .filter((q) => q.eq(q.field("tweet.id"), args.tweet.id))
+      .query("bookmarked_tweets")
+      .filter((q) => q.eq(q.field("tweet.id"), tweetId))
       .first();
 
     if (tweet) {
@@ -100,13 +175,7 @@ export const processTweet = mutation({
       return;
     }
 
-    // const screenshot = await fetchAction(api.action.screenShotPage, {
-    //   url: args.xCancelTweetUrl,
-    // });
-
-    const recordId = await ctx.db.insert("bookmarks", {
-      // thread_md_summary: "",
-      // thread_screenshot: screenshot,
+    const bookmarkId = await ctx.db.insert("bookmarked_tweets", {
       tweet: args.tweet,
       tweetBy: args.tweetBy,
       twitterUrl: args.twitterUrl,
@@ -114,9 +183,12 @@ export const processTweet = mutation({
       xCancelTweetUrl: args.xCancelTweetUrl,
     });
 
-    await ctx.scheduler.runAfter(0, api.action.screenShotPage, {
-      recordId: recordId,
+    // Screenshot page and patch records.
+    await ctx.scheduler.runAfter(0, api.screenshot.screenShotAndEmbed, {
+      bookmarkId: bookmarkId,
       url: args.xCancelTweetUrl,
+      originalText: args.tweet.text,
+      twitterUsername: systemUser,
     });
   },
 });

@@ -13,11 +13,14 @@ import {
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { LogOutIcon } from "lucide-react";
-
 import { authClient } from "@/lib/auth-client";
+import { isProd } from "@/lib/utils";
 
 export default function UserMenu() {
-  const currentUser = useQuery(api.auth.getCurrentUser);
+  const currentUser = useQuery(
+    api.auth.getCurrentUser,
+    isProd ? undefined : "skip"
+  );
 
   if (!currentUser) {
     return <></>;

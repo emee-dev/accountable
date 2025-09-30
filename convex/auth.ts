@@ -1,15 +1,25 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { betterAuth } from "better-auth";
-import { components } from "./_generated/api";
+import { anonymous } from "better-auth/plugins";
+import { api, components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
-import { query } from "./_generated/server";
+import { ActionCtx, mutation, query } from "./_generated/server";
+import authSchema from "./betterAuth/schema";
+import { v } from "convex/values";
 
 const siteUrl = process.env.SITE_URL!;
 
 // The component client has methods needed for integrating Convex with Better Auth,
 // as well as helper methods for general use.
-export const authComponent = createClient<DataModel>(components.betterAuth);
+export const authComponent = createClient<DataModel, typeof authSchema>(
+  components.betterAuth,
+  {
+    local: {
+      schema: authSchema,
+    },
+  }
+);
 
 export const createAuth = (
   ctx: GenericCtx<DataModel>,
@@ -32,6 +42,7 @@ export const createAuth = (
         twitterId: {
           type: "string",
           required: false,
+          unique: true,
         },
       },
       deleteUser: {
@@ -41,9 +52,12 @@ export const createAuth = (
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
-      async sendResetPassword(data, request) {},
-      async onPasswordReset(data, request) {
-        return;
+      sendResetPassword: async ({ user, url }) => {
+        await (ctx as ActionCtx).scheduler.runAfter(
+          0,
+          api.email.sendResetPassword,
+          { to: user.email, url }
+        );
       },
     },
     socialProviders: {
@@ -52,7 +66,7 @@ export const createAuth = (
         clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
       },
     },
-    plugins: [convex()],
+    plugins: [anonymous(), convex()],
   });
 };
 
@@ -60,5 +74,21 @@ export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
     return authComponent.getAuthUser(ctx);
+  },
+});
+
+export const updateUserTwitterId = mutation({
+  args: {
+    twitterId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const status = await createAuth(ctx).api.updateUser({
+      body: {
+        twitterId: args.twitterId,
+      },
+      headers: await authComponent.getHeaders(ctx),
+    });
+
+    return status;
   },
 });

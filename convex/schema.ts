@@ -2,14 +2,32 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 const schema = defineSchema({
+  sent_emails: defineTable({
+    email: v.string(),
+    expectation: v.union(
+      v.literal("delivered"),
+      v.literal("bounced"),
+      v.literal("complained")
+    ),
+  }).index("by_email", ["email"]),
   tags: defineTable({
     userId: v.string(),
     twitter_tag: v.string(),
   }),
 
-  bookmarks: defineTable({
-    thread_screenshot: v.optional(v.string()),
-    thread_md_summary: v.optional(v.string()),
+  notifications: defineTable({
+    email: v.string(),
+    events: v.array(
+      v.object({
+        label: v.string(),
+        date: v.string(),
+      })
+    ),
+  }),
+
+  bookmarked_tweets: defineTable({
+    storageId: v.optional(v.id<"_storage">("_storage")),
+    summary: v.optional(v.string()),
 
     // Screenshot urls
     twitterUrl: v.string(),
@@ -36,6 +54,12 @@ const schema = defineSchema({
       userName: v.string(),
       replyId: v.string(),
     }),
+  }),
+
+  events: defineTable({
+    twitterUsername: v.string(),
+    label: v.string(),
+    description: v.string(),
   }),
 });
 

@@ -17,3 +17,5 @@ export const getTweetHead = (props: { url: string; inReplyToId: string }) => {
 
   return finalUrl;
 };
+
+export const isProd = process.env.NODE_ENV === "production";

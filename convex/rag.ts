@@ -1,23 +1,54 @@
-import { components } from "./_generated/api";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { RAG } from "@convex-dev/rag";
-import { google } from "@ai-sdk/google";
 import { v } from "convex/values";
-import { action, query } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
-import { doc } from "convex-helpers/validators";
-import schema from "./schema";
+import { components } from "./_generated/api";
+import { action } from "./_generated/server";
+import { authComponent } from "./auth";
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY!,
+});
 
 const rag = new RAG(components.rag, {
   textEmbeddingModel: google.textEmbedding("gemini-embedding-001"),
-  embeddingDimension: 1536, // Needs to match your embedding model
+  embeddingDimension: 3072,
 });
 
+type Entry = {
+  entryId: string;
+  filterValues: [];
+  importance: number;
+  metadata: {
+    eventId: string;
+    eventType: string;
+  };
+  status: string;
+  text: string;
+};
+
+type Results = {
+  answer: string | undefined;
+  entries: Entry[];
+};
+
 export const ragAddContext = action({
-  args: { text: v.string() },
-  handler: async (ctx, { text }) => {
+  args: {
+    text: v.string(),
+    eventId: v.string(),
+    twitterUsername: v.string(),
+    eventType: v.union(
+      v.literal("twitter_bookmark"),
+      v.literal("scheduled_event")
+    ),
+  },
+  handler: async (ctx, args) => {
     await rag.add(ctx, {
-      namespace: "all-users",
-      text,
+      namespace: `${args.eventType}|${args.twitterUsername}`,
+      text: args.text,
+      metadata: {
+        eventId: args.eventId,
+        eventType: args.eventType,
+      },
     });
   },
 });
@@ -25,50 +56,69 @@ export const ragAddContext = action({
 export const ragSearch = action({
   args: {
     query: v.string(),
+    eventType: v.union(
+      v.literal("twitter_bookmark"),
+      v.literal("scheduled_event")
+    ),
   },
   handler: async (ctx, args) => {
-    const { results, text, entries, usage } = await rag.search(ctx, {
-      namespace: "global",
+    const user = await authComponent.getAuthUser(ctx);
+    if (user === null) {
+      throw new Error("Not authenticated");
+    }
+
+    if (!user.twitterId) {
+      throw new Error(
+        "You have not associated your twitter id to use this feature."
+      );
+    }
+
+    const { entries } = await rag.search(ctx, {
+      namespace: `${args.eventType}|${user.twitterId}`,
       query: args.query,
       limit: 5,
       vectorScoreThreshold: 0.5,
     });
 
-    return { results, text, entries, usage };
+    return { entries, answer: undefined } as unknown as Results;
   },
 });
-
-// export const getCurrentUser = query({
-//     args: {},
-//     returns: v.union(v.null(), doc(schema, "user")),
-//     handler: async (ctx) => {
-//       const identity = await ctx.auth.getUserIdentity();
-//       if (!identity) {
-//         return null;
-//       }
-//       return await ctx.db.get(identity.subject as Id<"user">);
-//     },
-//   });
 
 export const askQuestion = action({
   args: {
     prompt: v.string(),
+    eventType: v.union(
+      v.literal("twitter_bookmark"),
+      v.literal("scheduled_event")
+    ),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
+    const user = await authComponent.getAuthUser(ctx);
+    if (user === null) {
       throw new Error("Not authenticated");
     }
 
-    // const user = await ctx..get(identity.subject as Id<"user">);
-
-    // console.log("Identity: ", identity);
+    if (!user.twitterId) {
+      throw new Error(
+        "You have not associated your twitter id to use this feature."
+      );
+    }
 
     const { text, context } = await rag.generateText(ctx, {
-      search: { namespace: "userId", limit: 10 },
+      search: {
+        namespace: `${args.eventType}|${user.twitterId}`,
+        limit: 5,
+      },
       prompt: args.prompt,
-      model: google.chat("gemini-1.5-pro"),
+      model: google.chat("gemini-2.0-flash"),
+      system: `You are an AI search assistant for Bookmarker, 
+      a tool that improves bookmarking and search for Twitter 
+      users by making it easy to find and explore bookmarked events. 
+      Use the provided context to answer the user’s question 
+      clearly and concisely. Respond only in plain text, without markdown. 
+      If the answer is not in the context, do nothing.`,
     });
-    return { answer: text, context };
+
+    return { answer: text, entries: context.entries } as unknown as Results;
   },
 });

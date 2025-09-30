@@ -4,9 +4,10 @@ import { ReactNode } from "react";
 import { ConvexReactClient } from "convex/react";
 import { authClient } from "@/lib/auth-client";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { isProd } from "@/lib/utils";
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!, {
-  expectAuth: true,
+  expectAuth: isProd ? true : false,
   // Disables - Error: Invalid deployment address
   // skipConvexDeploymentUrlCheck: true,
 });

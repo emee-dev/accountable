@@ -146,6 +146,7 @@ export const POST = async (req: NextRequest) => {
 
     const body = (await req.json()) as TwitterAPI;
 
+    // Format messages
     const tweetMessages: TweetMessage[] = body.tweets.map((item) => ({
       thread_screenshot: "",
       thread_md_summary: "",
@@ -175,7 +176,14 @@ export const POST = async (req: NextRequest) => {
       ...getScreenShotUrls(item),
     }));
 
-    await fetchMutation(api.bookmarks.handleWebhook, { tweets: tweetMessages });
+    // Remove untagged tweets
+    const taggedTweets = tweetMessages.filter(
+      (item) =>
+        item.tweet.text.toLowerCase().includes("@usepanda_ bookmark this") ||
+        item.tweet.text.toLowerCase().includes("usepanda_ bookmark this")
+    );
+
+    await fetchMutation(api.bookmarks.handleWebhook, { tweets: taggedTweets });
 
     return Response.json({ message: "ok" });
   } catch (error) {
