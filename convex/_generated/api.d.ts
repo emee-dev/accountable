@@ -17,8 +17,8 @@ import type * as betterAuth_generatedSchema from "../betterAuth/generatedSchema.
 import type * as bookmarks from "../bookmarks.js";
 import type * as crons from "../crons.js";
 import type * as email from "../email.js";
-import type * as emails_BaseEmail from "../emails/BaseEmail.js";
 import type * as emails_PasswordResetEmail from "../emails/PasswordResetEmail.js";
+import type * as event from "../event.js";
 import type * as http from "../http.js";
 import type * as rag from "../rag.js";
 import type * as screenshot from "../screenshot.js";
@@ -47,8 +47,8 @@ declare const fullApi: ApiFromModules<{
   bookmarks: typeof bookmarks;
   crons: typeof crons;
   email: typeof email;
-  "emails/BaseEmail": typeof emails_BaseEmail;
   "emails/PasswordResetEmail": typeof emails_PasswordResetEmail;
+  event: typeof event;
   http: typeof http;
   rag: typeof rag;
   screenshot: typeof screenshot;

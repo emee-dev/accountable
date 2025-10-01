@@ -12,6 +12,7 @@ import { useState } from "react";
 import { GithubIconLight } from "./icons/github-icon-light";
 import { authClient } from "@/lib/auth-client";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const defaultOptions = {
   loop: true,
@@ -47,6 +48,9 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
         onError: (ctx) => {
           setLoading(false);
           console.error("SignUp error:", ctx.error.message);
+          toast("Oops!!", {
+            description: `SignUp error: ${ctx.error.message}`,
+          });
         },
       }
     );
@@ -67,6 +71,9 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
         onError: (ctx) => {
           setLoading(false);
           console.error("SignIn error:", ctx.error.message);
+          toast("Oops!!", {
+            description: `SignIn error: ${ctx.error.message}`,
+          });
         },
       }
     );
@@ -81,6 +88,9 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
         onError: (ctx) => {
           setLoading(false);
           console.error("Github auth error:", ctx.error.message);
+          toast("Oops!!", {
+            description: `Github auth error: ${ctx.error.message}`,
+          });
         },
       }
     );
@@ -97,7 +107,9 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
         },
         onError: (ctx) => {
           setLoading(false);
-          alert(ctx.error.message);
+          toast("Oops!!", {
+            description: `Anonymous auth error: ${ctx.error.message}`,
+          });
         },
       }
     );
@@ -110,8 +122,10 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
         email,
         redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`,
       });
-    } catch {
-      console.error("Failed to send reset link");
+    } catch (err: any) {
+      toast("Oops!!", {
+        description: `Reset password error: ${err?.message}`,
+      });
     } finally {
       setForgotLoading(false);
     }

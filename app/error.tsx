@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button"; // if you use shadcn/ui
+import Link from "next/link";
 
 export default function ErrorPage({
   error,
@@ -11,8 +12,6 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const router = useRouter();
-
   useEffect(() => {
     console.error("App Error:", error);
   }, [error]);
@@ -30,9 +29,9 @@ export default function ErrorPage({
         <Button variant="outline" size="sm" onClick={() => reset()}>
           Try Again
         </Button>
-        <Button size="sm" onClick={() => router.push("/")}>
-          Go Home
-        </Button>
+        <Link href="/">
+          <Button size="sm">Go Home</Button>
+        </Link>
       </div>
     </div>
   );

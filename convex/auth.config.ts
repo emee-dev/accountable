@@ -8,9 +8,9 @@ export default {
     //   domain: `http://localhost:3000`,
     //   applicationID: "betterAuth",
     // },
-    {
-      domain: `https://accountable-lemon.vercel.app`,
-      applicationID: "Better Auth",
-    },
+    // {
+    //   domain: `https://accountable-lemon.vercel.app`,
+    //   applicationID: "Better Auth",
+    // },
   ],
 };

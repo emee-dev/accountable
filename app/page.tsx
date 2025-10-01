@@ -69,6 +69,21 @@ type PageProps = {
   }>;
 };
 
+type ContentProps = {
+  view: string;
+  twitterUsername: string;
+};
+
+type TweetListProps = {
+  twitterUsername: string;
+};
+
+type EventsViewProps = {
+  twitterUsername: string;
+};
+
+type CaptionLayout = React.ComponentProps<typeof Calendar>["captionLayout"];
+
 export default function BookmarksPage(props: PageProps) {
   const params = use(props.searchParams);
   const user = useQuery(api.bookmarks.getCurrentUser);
@@ -96,49 +111,10 @@ export default function BookmarksPage(props: PageProps) {
             </div>
           </div>
         </AuthLoading>
-
-        {/* {!isProd && (
-          <Content view={params.view} twitterUsername={user?.twitterId || ""} />
-        )} */}
-
-        {/* {env === "production" && (
-          <Authenticated>
-            <Content
-              view={params.view}
-              twitterUsername={user?.twitterId || ""}
-            />
-          </Authenticated>
-        )} */}
-
-        {/* {env === "production" && (
-          <Unauthenticated>
-            <div className="w-full max-w-sm md:max-w-3xl">
-              <AuthForm />
-            </div>
-          </Unauthenticated>
-        )} */}
-
-        {/* {env === "production" && (
-          <AuthLoading>
-            <div className="flex pt-16 w-full items-center justify-center bg-background">
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">
-                  Authenticating...
-                </p>
-              </div>
-            </div>
-          </AuthLoading>
-        )} */}
       </div>
     </>
   );
 }
-
-type ContentProps = {
-  view: string;
-  twitterUsername: string;
-};
 
 function Content({ view, twitterUsername }: ContentProps) {
   if (!view) {
@@ -155,16 +131,6 @@ function Content({ view, twitterUsername }: ContentProps) {
 
   return <div>No content to show</div>;
 }
-
-type TweetListProps = {
-  twitterUsername: string;
-};
-
-type EventsViewProps = {
-  twitterUsername: string;
-};
-
-type CaptionLayout = React.ComponentProps<typeof Calendar>["captionLayout"];
 
 const TweetList = ({ twitterUsername }: TweetListProps) => {
   const [dropdown, _] = useState<CaptionLayout>("dropdown");
