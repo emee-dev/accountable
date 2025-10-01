@@ -3,8 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
-    remotePatterns: [],
-    formats: [],
   },
   async redirects() {
     return [
@@ -14,7 +12,7 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
     ];
-  },gt
+  },
 };
 
 export default nextConfig;
