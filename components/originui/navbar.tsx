@@ -45,6 +45,11 @@ import { toast } from "sonner";
 import { DocSearch } from "../doc-search";
 import { ThemeToggler } from "../magicui/theme-toggler";
 
+function getInitials(name: string): string {
+  if (!name) return "";
+  return name.slice(0, 2).toUpperCase();
+}
+
 export default function Navbar(props: { user: any }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -148,7 +153,9 @@ export default function Navbar(props: { user: any }) {
                   >
                     <Avatar>
                       <AvatarImage src="./avatar.jpg" alt="Profile image" />
-                      <AvatarFallback>KK</AvatarFallback>
+                      <AvatarFallback>
+                        {getInitials(props.user.name)}
+                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>

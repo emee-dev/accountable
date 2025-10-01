@@ -8,7 +8,8 @@ import { ActionCtx, mutation, query } from "./_generated/server";
 import authSchema from "./betterAuth/schema";
 import { v } from "convex/values";
 
-const siteUrl = process.env.SITE_URL!;
+const siteUrl =
+  process.env.SITE_URL! || "https://accountable-lemon.vercel.app/";
 
 // The component client has methods needed for integrating Convex with Better Auth,
 // as well as helper methods for general use.
@@ -25,6 +26,8 @@ export const createAuth = (
   ctx: GenericCtx<DataModel>,
   { optionsOnly }: { optionsOnly?: boolean } = { optionsOnly: false }
 ) => {
+  console.log("createAuth SITE_URL: ", siteUrl);
+
   return betterAuth({
     logger: {
       disabled: optionsOnly,
@@ -64,8 +67,11 @@ export const createAuth = (
       github: {
         clientId: process.env.GITHUB_CLIENT_ID as string,
         clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+        // redirectURI: `${siteUrl}/api/auth/callback/github`,
+        redirectURI: `https://accountable-lemon.vercel.app/api/auth/callback/github`,
       },
     },
+    trustedOrigins: ["*"],
     plugins: [anonymous(), convex()],
   });
 };

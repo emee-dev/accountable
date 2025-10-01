@@ -26,134 +26,6 @@ import { CalendarClock, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { use, useState } from "react";
 
-const bookmarks = [
-  {
-    _id: "1",
-    storageId: "screenshot_1.png",
-    summary: "Discussion on web performance optimization.",
-    twitterUrl: "https://twitter.com/someuser/status/1701234567890",
-    xCancelTweetUrl: "https://x.com/someuser/status/1701234567890",
-    tweet: {
-      id: "1701234567890",
-      url: "https://twitter.com/someuser/status/1701234567890",
-      twitterUrl: "https://twitter.com/someuser/status/1701234567890",
-      text: "Improving Core Web Vitals is not just about SEO—it's about user experience. 🚀",
-      createdAt: "2025-09-25T10:15:00Z",
-    },
-    tweetBy: {
-      id: "user_101",
-      userName: "someuser",
-      profile_bio: "Web perf enthusiast | JS & React dev",
-      profilePicture: "https://pbs.twimg.com/profile_images/101.png",
-    },
-    replyingTo: {
-      id: "user_200",
-      userName: "devguru",
-      replyId: "1701234000000",
-    },
-  },
-  {
-    _id: "2",
-    storageId: "screenshot_2.png",
-    summary: "AI tools for writing better commit messages.",
-    twitterUrl: "https://twitter.com/commitbot/status/1702234567890",
-    xCancelTweetUrl: "https://x.com/commitbot/status/1702234567890",
-    tweet: {
-      id: "1702234567890",
-      url: "https://twitter.com/commitbot/status/1702234567890",
-      twitterUrl: "https://twitter.com/commitbot/status/1702234567890",
-      text: "Pro tip: Use AI to generate clear commit messages from diffs. Saves tons of time. 🤖",
-      createdAt: "2025-09-26T12:20:00Z",
-    },
-    tweetBy: {
-      id: "user_102",
-      userName: "commitbot",
-      profile_bio: "Automating boring dev tasks.",
-      profilePicture: "https://pbs.twimg.com/profile_images/102.png",
-    },
-    replyingTo: {
-      id: "user_300",
-      userName: "opensource",
-      replyId: "1702234001111",
-    },
-  },
-  {
-    _id: "3",
-    storageId: "screenshot_3.png",
-    summary: "Announcement of a new Node.js release.",
-    twitterUrl: "https://twitter.com/nodejs/status/1703234567890",
-    xCancelTweetUrl: "https://x.com/nodejs/status/1703234567890",
-    tweet: {
-      id: "1703234567890",
-      url: "https://twitter.com/nodejs/status/1703234567890",
-      twitterUrl: "https://twitter.com/nodejs/status/1703234567890",
-      text: "Node.js 22 is here 🎉 Includes faster startup times and native fetch enabled by default.",
-      createdAt: "2025-09-27T09:30:00Z",
-    },
-    tweetBy: {
-      id: "user_103",
-      userName: "nodejs",
-      profile_bio: "The official Node.js Twitter account.",
-      profilePicture: "https://pbs.twimg.com/profile_images/103.png",
-    },
-    replyingTo: {
-      id: "user_400",
-      userName: "jsdev",
-      replyId: "1703234002222",
-    },
-  },
-  {
-    _id: "4",
-    storageId: "screenshot_4.png",
-    summary: "Tips for learning Rust as a JS dev.",
-    twitterUrl: "https://twitter.com/rustacean/status/1704234567890",
-    xCancelTweetUrl: "https://x.com/rustacean/status/1704234567890",
-    tweet: {
-      id: "1704234567890",
-      url: "https://twitter.com/rustacean/status/1704234567890",
-      twitterUrl: "https://twitter.com/rustacean/status/1704234567890",
-      text: "JS devs: Start with Rust's `Result` & `Option` types. Once you get those, error handling feels magical. 🦀",
-      createdAt: "2025-09-28T15:45:00Z",
-    },
-    tweetBy: {
-      id: "user_104",
-      userName: "rustacean",
-      profile_bio: "Loves memory safety and expressive type systems.",
-      profilePicture: "https://pbs.twimg.com/profile_images/104.png",
-    },
-    replyingTo: {
-      id: "user_500",
-      userName: "typemaster",
-      replyId: "1704234003333",
-    },
-  },
-  {
-    _id: "5",
-    storageId: "screenshot_5.png",
-    summary: "Discussion on Convex.dev RAG features.",
-    twitterUrl: "https://twitter.com/convex/status/1705234567890",
-    xCancelTweetUrl: "https://x.com/convex/status/1705234567890",
-    tweet: {
-      id: "1705234567890",
-      url: "https://twitter.com/convex/status/1705234567890",
-      twitterUrl: "https://twitter.com/convex/status/1705234567890",
-      text: "Our new RAG component makes it easy to build AI-powered search into your apps. Try it out!",
-      createdAt: "2025-09-29T17:10:00Z",
-    },
-    tweetBy: {
-      id: "user_105",
-      userName: "convex",
-      profile_bio: "The reactive database + serverless functions platform.",
-      profilePicture: "https://pbs.twimg.com/profile_images/105.png",
-    },
-    replyingTo: {
-      id: "user_600",
-      userName: "aidev",
-      replyId: "1705234004444",
-    },
-  },
-];
-
 const events = [
   {
     _id: "6510f0a1c1e8f3d9a1b23401",
@@ -203,8 +75,8 @@ type PageProps = {
 export default function BookmarksPage(props: PageProps) {
   const params = use(props.searchParams);
   const user = useQuery(
-    api.bookmarks.getCurrentUser,
-    isProd ? undefined : "skip"
+    api.bookmarks.getCurrentUser
+    // isProd ? undefined : "skip"
   );
 
   return (
@@ -212,28 +84,47 @@ export default function BookmarksPage(props: PageProps) {
       <div className="flex flex-col gap-8 p-4 w-full lg:max-w-[70%] mx-auto md:max-w-[80%] lg:min-w-3xl">
         <Navbar user={user} />
 
-        {!isProd && (
+        <Authenticated>
           <Content view={params.view} twitterUsername={user?.twitterId || ""} />
-        )}
+        </Authenticated>
 
-        {env === "production" && (
+        <Unauthenticated>
+          <div className="w-full max-w-sm md:max-w-3xl">
+            <AuthForm />
+          </div>
+        </Unauthenticated>
+
+        <AuthLoading>
+          <div className="flex pt-16 w-full items-center justify-center bg-background">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">Authenticating...</p>
+            </div>
+          </div>
+        </AuthLoading>
+
+        {/* {!isProd && (
+          <Content view={params.view} twitterUsername={user?.twitterId || ""} />
+        )} */}
+
+        {/* {env === "production" && (
           <Authenticated>
             <Content
               view={params.view}
               twitterUsername={user?.twitterId || ""}
             />
           </Authenticated>
-        )}
+        )} */}
 
-        {env === "production" && (
+        {/* {env === "production" && (
           <Unauthenticated>
             <div className="w-full max-w-sm md:max-w-3xl">
               <AuthForm />
             </div>
           </Unauthenticated>
-        )}
+        )} */}
 
-        {env === "production" && (
+        {/* {env === "production" && (
           <AuthLoading>
             <div className="flex pt-16 w-full items-center justify-center bg-background">
               <div className="flex flex-col items-center gap-3">
@@ -244,7 +135,7 @@ export default function BookmarksPage(props: PageProps) {
               </div>
             </div>
           </AuthLoading>
-        )}
+        )} */}
       </div>
     </>
   );
