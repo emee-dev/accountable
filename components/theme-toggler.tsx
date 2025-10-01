@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { flushSync } from "react-dom";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   className?: string;

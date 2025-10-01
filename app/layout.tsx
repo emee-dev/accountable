@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <ConvexClientProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
           className={`${inter.className} ${geistMono.variable} ${GeistSans.variable} ${jetbrains_mono.variable} antialiased`}
         >

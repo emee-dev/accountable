@@ -21,7 +21,7 @@ export const getCurrentUser = query({
 export const listBookmarks = query({
   args: {
     date: v.string(),
-    twitterUsername: v.string(),
+    twitterId: v.string(),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
@@ -51,7 +51,7 @@ export const listBookmarks = query({
       .query("bookmarked_tweets")
       .filter((q) =>
         q.and(
-          q.eq(q.field("tweetBy.userName"), args.twitterUsername),
+          q.eq(q.field("tweetBy.userName"), args.twitterId),
           q.gte(q.field("_creationTime"), dayStart),
           q.lte(q.field("_creationTime"), dayEnd)
         )

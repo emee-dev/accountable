@@ -41,8 +41,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Select as SelectPrimitive } from "radix-ui";
 import { useState } from "react";
 import { toast } from "sonner";
-import { DocSearch } from "../doc-search";
-import { ThemeToggler } from "../magicui/theme-toggler";
+import { DocSearch } from "./doc-search";
+import { ThemeToggler } from "@/components/theme-toggler";
 
 function getInitials(name: string): string {
   if (!name) return "";
@@ -74,29 +74,6 @@ export default function Navbar(props: { user: any }) {
                   <Logo />
                 </BreadcrumbLink>
               </BreadcrumbItem>
-
-              {!pathname.includes("/tweets/") && !isProd && (
-                <BreadcrumbItem>
-                  <Select defaultValue={current} onValueChange={handleChange}>
-                    <SelectPrimitive.SelectTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="focus-visible:bg-accent text-foreground h-8 px-1.5 focus-visible:ring-0"
-                      >
-                        <SelectValue placeholder="Select project" />
-                        <ChevronsUpDown
-                          size={14}
-                          className="text-muted-foreground/80"
-                        />
-                      </Button>
-                    </SelectPrimitive.SelectTrigger>
-                    <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
-                      <SelectItem value="event">Events</SelectItem>
-                      <SelectItem value="twitter">Twitter bookmarks</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </BreadcrumbItem>
-              )}
 
               <Authenticated>
                 {!pathname.includes("/tweets/") && (

@@ -56,10 +56,11 @@ const schema = defineSchema({
     }),
   }),
 
-  events: defineTable({
-    twitterUsername: v.string(),
+  gists: defineTable({
+    twitterId: v.string(),
     label: v.string(),
     description: v.string(),
+    email_blast: v.optional(v.array(v.string())),
   }),
 });
 

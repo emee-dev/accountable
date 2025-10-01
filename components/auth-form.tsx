@@ -180,7 +180,6 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
           <CardContent className="grid p-0 lg:grid-cols-2">
             <form onSubmit={handleSubmit} className="p-6 md:p-8">
               <div className="flex flex-col gap-6">
-                {/* Header */}
                 <div className="flex flex-col items-center text-center">
                   <h1 className="text-2xl font-bold">{renderHeader().title}</h1>
                   <p className="text-muted-foreground text-balance">
@@ -188,7 +187,6 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
                   </p>
                 </div>
 
-                {/* Sign Up extra fields */}
                 {view === "signUp" && (
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-2">
@@ -214,7 +212,6 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
                   </div>
                 )}
 
-                {/* Email */}
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -226,7 +223,6 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
                   />
                 </div>
 
-                {/* Password */}
                 {view !== "forgotPassword" && (
                   <div className="grid gap-2">
                     <div className="flex items-center">
@@ -262,7 +258,6 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
                   </div>
                 )}
 
-                {/* Submit */}
                 <Button
                   type="submit"
                   className="w-full"
@@ -277,7 +272,6 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
                     : "Login"}
                 </Button>
 
-                {/* OAuth / Extra options */}
                 {view !== "forgotPassword" && (
                   <>
                     <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:flex after:items-center after:border-t">
@@ -314,7 +308,6 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
                   </>
                 )}
 
-                {/* Footer Links */}
                 <div className="text-center text-sm">
                   {view === "signUp" ? (
                     <>
@@ -357,7 +350,6 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
           </CardContent>
         )}
 
-        {/* Rick Roll View */}
         {shouldRickRoll && (
           <CardContent className="flex flex-col items-center justify-center gap-4 p-6">
             <div className="relative w-full max-w-sm mx-auto">
