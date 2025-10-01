@@ -141,7 +141,7 @@ export const POST = async (req: NextRequest) => {
     const receivedAPIKey = reqHeaders.get("x-api-key");
 
     if (receivedAPIKey !== apiSecret) {
-      return Response.json({ message: "Forbidden" }, { status: 404 });
+      return Response.json({ message: "Forbidden" });
     }
 
     const body = (await req.json()) as TwitterAPI;
