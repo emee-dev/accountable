@@ -9,6 +9,7 @@ import {
 } from "./_generated/server";
 import { authComponent } from "./auth";
 import { Doc } from "./_generated/dataModel";
+import component from "@convex-dev/rag/convex.config";
 
 // You can get the current user from the auth component
 export const getCurrentUser = query({
@@ -154,12 +155,12 @@ export const processTweet = mutation({
       userName: systemUser,
     });
 
-    if (!isValidUser) {
-      console.log(
-        `Cannot bookmark this tweet, invalid user by @${args.tweetBy.userName}.`
-      );
-      return;
-    }
+    // if (!isValidUser) {
+    //   console.log(
+    //     `Cannot bookmark this tweet, invalid user by @${args.tweetBy.userName}.`
+    //   );
+    //   return;
+    // }
 
     const tweetId = args.tweet.id;
 
