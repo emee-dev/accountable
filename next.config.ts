@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
     ];
-  },
+  },gt
 };
 
 export default nextConfig;

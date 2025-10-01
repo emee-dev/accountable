@@ -91,7 +91,7 @@ interface TwitterAPI {
   rule_id: string;
   rule_tag: string;
   rule_value: string;
-  event_type: "tweet";
+  event_type: "tweet" | "test_webhook_url";
   timestamp: number;
 }
 
@@ -145,6 +145,14 @@ export const POST = async (req: NextRequest) => {
     }
 
     const body = (await req.json()) as TwitterAPI;
+
+    if (!body || !body.tweets) {
+      return Response.json({ message: "No payload" });
+    }
+
+    if (body.event_type === "test_webhook_url") {
+      return Response.json({ message: "Acknowledged" });
+    }
 
     // Format messages
     const tweetMessages: TweetMessage[] = body.tweets.map((item) => ({
