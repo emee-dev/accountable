@@ -109,7 +109,7 @@ pnpm dev
 
 ## Demo
 
-1. Tag your `usepanda_` account on X in your replies.
+1. Tag `@usepanda_` account on X in your replies.
 
 ```ts
 @usepanda_ bookmark this
