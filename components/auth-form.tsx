@@ -81,7 +81,10 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
 
   const handleGithubSignIn = async () => {
     await authClient.signIn.social(
-      { provider: "github" },
+      {
+        provider: "github",
+        callbackURL: `${process.env.NEXT_PUBLIC_SITE_URL}`,
+      },
       {
         onRequest: () => setLoading(true),
         onSuccess: () => setLoading(false),

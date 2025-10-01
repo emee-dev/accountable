@@ -8,9 +8,6 @@ import { ActionCtx, mutation, query } from "./_generated/server";
 import authSchema from "./betterAuth/schema";
 import { v } from "convex/values";
 
-const siteUrl =
-  process.env.SITE_URL! || "https://accountable-lemon.vercel.app/";
-
 // The component client has methods needed for integrating Convex with Better Auth,
 // as well as helper methods for general use.
 export const authComponent = createClient<DataModel, typeof authSchema>(
@@ -26,6 +23,9 @@ export const createAuth = (
   ctx: GenericCtx<DataModel>,
   { optionsOnly }: { optionsOnly?: boolean } = { optionsOnly: false }
 ) => {
+  const siteUrl =
+    process.env.SITE_URL! || "https://accountable-lemon.vercel.app/";
+
   console.log("createAuth SITE_URL: ", siteUrl);
 
   return betterAuth({
@@ -62,13 +62,22 @@ export const createAuth = (
           { to: user.email, url }
         );
       },
+      revokeSessionsOnPasswordReset: true,
     },
     socialProviders: {
       github: {
         clientId: process.env.GITHUB_CLIENT_ID as string,
         clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-        // redirectURI: `${siteUrl}/api/auth/callback/github`,
         redirectURI: `https://accountable-lemon.vercel.app/api/auth/callback/github`,
+        overrideUserInfoOnSignIn: true,
+        mapProfileToUser: async (profile) => {
+          return {
+            email: profile.email,
+            image: profile.avatar_url,
+            name: profile.name || profile.login,
+            twitterId: profile.twitter_username || undefined,
+          };
+        },
       },
     },
     trustedOrigins: ["*"],
