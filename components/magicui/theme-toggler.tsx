@@ -3,6 +3,7 @@
 import { Moon, Sun } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { flushSync } from "react-dom";
+import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 
@@ -11,34 +12,23 @@ type Props = {
 };
 
 export const ThemeToggler = ({ className }: Props) => {
+  const { setTheme, resolvedTheme } = useTheme();
   const [isDark, setIsDark] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const updateTheme = () => {
-      setIsDark(document.documentElement.classList.contains("dark"));
-    };
-
-    updateTheme();
-
-    const observer = new MutationObserver(updateTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
+    setIsDark(resolvedTheme === "dark");
+  }, [resolvedTheme]);
 
   const toggleTheme = useCallback(async () => {
     if (!buttonRef.current) return;
 
+    const newTheme = isDark ? "light" : "dark";
+
     await document.startViewTransition(() => {
       flushSync(() => {
-        const newTheme = !isDark;
-        setIsDark(newTheme);
-        document.documentElement.classList.toggle("dark");
-        localStorage.setItem("theme", newTheme ? "dark" : "light");
+        setTheme(newTheme);
+        setIsDark(newTheme === "dark");
       });
     }).ready;
 
@@ -47,8 +37,8 @@ export const ThemeToggler = ({ className }: Props) => {
     const x = left + width / 2;
     const y = top + height / 2;
     const maxRadius = Math.hypot(
-      Math.max(left, window.innerWidth - left),
-      Math.max(top, window.innerHeight - top)
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
     );
 
     document.documentElement.animate(
@@ -64,7 +54,7 @@ export const ThemeToggler = ({ className }: Props) => {
         pseudoElement: "::view-transition-new(root)",
       }
     );
-  }, [isDark]);
+  }, [isDark, setTheme]);
 
   return (
     <Button
@@ -72,7 +62,7 @@ export const ThemeToggler = ({ className }: Props) => {
       onClick={toggleTheme}
       size="icon"
       variant="ghost"
-      aria-label="Open notifications"
+      aria-label="Toggle theme"
       className={cn(
         "text-muted-foreground relative size-8 rounded-full shadow-none",
         className

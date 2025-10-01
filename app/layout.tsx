@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
-import { ConvexClientProvider } from "@/provider";
+import { ConvexClientProvider, ThemeProvider } from "@/provider";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import { Geist_Mono, Inter, JetBrains_Mono } from "next/font/google";
@@ -37,10 +37,17 @@ export default function RootLayout({
         <body
           className={`${inter.className} ${geistMono.variable} ${GeistSans.variable} ${jetbrains_mono.variable} antialiased`}
         >
-          <div className="min-h-screen bg-muted flex flex-col transition-colors duration-300">
-            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-            <Toaster />
-          </div>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="min-h-screen bg-muted flex flex-col transition-colors duration-300">
+              <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+              <Toaster />
+            </div>
+          </ThemeProvider>
         </body>
       </html>
     </ConvexClientProvider>

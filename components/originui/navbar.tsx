@@ -1,7 +1,6 @@
 "use client";
 
 import Logo from "@/components/logo";
-import NotificationMenu from "@/components/notification-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Breadcrumb,
@@ -130,8 +129,6 @@ export default function Navbar(props: { user: any }) {
         </div>
 
         <div className="grow">
-          {!isProd && <DocSearch />}
-
           <Authenticated>
             <DocSearch />
           </Authenticated>
@@ -142,7 +139,6 @@ export default function Navbar(props: { user: any }) {
             <TwitterSetup user={props.user} />
           </Authenticated>
           <ThemeToggler />
-          <NotificationMenu />
           <Authenticated>
             {props.user && (
               <DropdownMenu>
@@ -212,7 +208,7 @@ export function TwitterSetup({ user }: { user: any }) {
       setIsLoading(true);
 
       await updateUser({
-        twitterId: username.replace(/^@/, ""), // trim leading "@"
+        twitterId: username.replace(/^@/, ""),
       });
 
       toast("Username saved", {

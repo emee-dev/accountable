@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/convex/_generated/api";
-import { isProd } from "@/lib/utils";
 import {
   Authenticated,
   AuthLoading,
@@ -63,8 +62,6 @@ const events = [
   },
 ];
 
-const env = process.env.NODE_ENV;
-
 type PageProps = {
   params: Promise<any>;
   searchParams: Promise<{
@@ -74,10 +71,7 @@ type PageProps = {
 
 export default function BookmarksPage(props: PageProps) {
   const params = use(props.searchParams);
-  const user = useQuery(
-    api.bookmarks.getCurrentUser
-    // isProd ? undefined : "skip"
-  );
+  const user = useQuery(api.bookmarks.getCurrentUser);
 
   return (
     <>
